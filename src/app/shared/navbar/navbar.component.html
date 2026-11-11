@@ -1,0 +1,231 @@
+<header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 gap-2">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center shrink-0">
+        <a (click)="navigateHome()" class="flex items-center space-x-2 group cursor-pointer">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-indigo-950 font-black text-lg sm:text-xl shadow-lg group-hover:scale-105 transition-transform">
+            S
+          </div>
+          <div>
+            <span class="text-lg sm:text-xl font-extrabold tracking-tight text-white">Soluciona</span>
+            <span class="block text-[9px] sm:text-[10px] text-amber-300 font-medium tracking-wide">Armenia, Quindío</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Suscripción Reactiva al Usuario con Signals -->
+      @if (currentUser(); as user) {
+        <!-- Navigation Links Desktop -->
+        <nav class="hidden md:flex items-center space-x-2">
+          
+          <!-- MENÚ PARA CLIENTE -->
+          @if (user.role === 'cliente') {
+            <a
+              routerLink="/search"
+              routerLinkActive="bg-indigo-800 text-white shadow-inner"
+              class="px-3.5 py-2 rounded-lg text-xs font-bold text-indigo-100 hover:bg-indigo-800 hover:text-white transition"
+            >
+              🗺️ Buscar Técnicos
+            </a>
+            
+            <a
+              routerLink="/service-request"
+              routerLinkActive="bg-indigo-800 text-white shadow-inner"
+              class="px-3.5 py-2 rounded-lg text-xs font-bold text-indigo-100 hover:bg-indigo-800 hover:text-white transition"
+            >
+              📋 Mis Solicitudes
+            </a>
+
+            <a
+              routerLink="/chat"
+              routerLinkActive="bg-indigo-800 text-white shadow-inner"
+              class="px-3.5 py-2 rounded-lg text-xs font-bold text-indigo-100 hover:bg-indigo-800 hover:text-white transition"
+            >
+              💬 Mis Mensajes
+            </a>
+
+            <a
+              routerLink="/service-request/new"
+              class="ml-2 px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-indigo-950 text-xs font-extrabold shadow-sm transition transform hover:-translate-y-0.5"
+            >
+              + Publicar Solicitud
+            </a>
+          }
+
+          <!-- MENÚ PARA TÉCNICO -->
+          @if (user.role === 'tecnico') {
+            <a
+              routerLink="/service-request"
+              routerLinkActive="bg-indigo-800 text-white shadow-inner"
+              class="px-3.5 py-2 rounded-lg text-xs font-bold text-indigo-100 hover:bg-indigo-800 hover:text-white transition"
+            >
+              📥 Bandeja de Trabajos
+            </a>
+
+            <a
+              routerLink="/technician-profile"
+              routerLinkActive="bg-indigo-800 text-white shadow-inner"
+              class="px-3.5 py-2 rounded-lg text-xs font-bold text-amber-300 hover:bg-indigo-800 hover:text-amber-200 transition"
+            >
+              🪪 Mi Ficha & Tarifas
+            </a>
+
+            <a
+              routerLink="/chat"
+              routerLinkActive="bg-indigo-800 text-white shadow-inner"
+              class="px-3.5 py-2 rounded-lg text-xs font-bold text-indigo-100 hover:bg-indigo-800 hover:text-white transition"
+            >
+              💬 Mensajes con Clientes
+            </a>
+          }
+
+        </nav>
+
+        <!-- User Info, Logout & Mobile Menu Button -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <div class="flex items-center space-x-2 bg-indigo-950/60 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-indigo-700/50">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs uppercase text-amber-300 shrink-0">
+              {{ user.full_name?.charAt(0) || 'U' }}
+            </div>
+            <div class="hidden sm:block text-left text-xs leading-tight">
+              <div class="font-semibold text-white truncate max-w-[130px]">{{ user.full_name }}</div>
+              <div class="text-[10px] uppercase font-bold text-amber-400">
+                {{ user.role === 'tecnico' ? 'Técnico Profesional' : 'Cliente' }}
+              </div>
+            </div>
+          </div>
+
+          <button
+            (click)="logout()"
+            class="hidden md:inline-block text-xs bg-red-600/80 hover:bg-red-600 text-white font-medium px-3 py-1.5 rounded-lg transition cursor-pointer"
+            title="Cerrar Sesión"
+          >
+            Salir
+          </button>
+
+          <!-- Botón menú hamburguesa móvil -->
+          <button
+            type="button"
+            (click)="toggleMobileMenu()"
+            class="md:hidden inline-flex items-center justify-center p-2 rounded-xl bg-indigo-800 hover:bg-indigo-700 text-indigo-100 hover:text-white transition cursor-pointer"
+            [attr.aria-expanded]="mobileMenuOpen()"
+            aria-label="Abrir menú de navegación"
+          >
+            @if (mobileMenuOpen()) {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            } @else {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            }
+          </button>
+        </div>
+      } @else {
+        <!-- Menú si no está registrado / logueado -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2">
+          <a
+            routerLink="/auth/login"
+            class="text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3 py-2 text-indigo-100 hover:text-white transition whitespace-nowrap"
+          >
+            Iniciar Sesión
+          </a>
+          <a
+            routerLink="/auth/register"
+            class="text-[11px] sm:text-xs font-bold px-3 sm:px-3.5 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-indigo-950 shadow transition whitespace-nowrap"
+          >
+            Registrarme
+          </a>
+        </div>
+      }
+
+    </div>
+  </div>
+
+  <!-- Menú desplegable móvil (< md) -->
+  @if (currentUser(); as user) {
+    @if (mobileMenuOpen()) {
+      <div class="md:hidden bg-indigo-950/95 border-t border-indigo-800 px-4 py-4 space-y-2">
+        <div class="pb-3 mb-2 border-b border-indigo-800/80 flex items-center justify-between text-xs">
+          <div>
+            <div class="font-bold text-white">{{ user.full_name }}</div>
+            <div class="text-[10px] uppercase font-bold text-amber-400">
+              {{ user.role === 'tecnico' ? 'Técnico Profesional' : 'Cliente' }}
+            </div>
+          </div>
+          <button
+            type="button"
+            (click)="logout()"
+            class="text-xs bg-red-600/90 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg transition cursor-pointer"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+
+        @if (user.role === 'cliente') {
+          <a
+            routerLink="/search"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-indigo-800 text-white"
+            class="block px-3.5 py-2.5 rounded-xl text-xs font-bold text-indigo-100 hover:bg-indigo-800 transition"
+          >
+            🗺️ Buscar Técnicos
+          </a>
+          <a
+            routerLink="/service-request"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-indigo-800 text-white"
+            class="block px-3.5 py-2.5 rounded-xl text-xs font-bold text-indigo-100 hover:bg-indigo-800 transition"
+          >
+            📋 Mis Solicitudes
+          </a>
+          <a
+            routerLink="/chat"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-indigo-800 text-white"
+            class="block px-3.5 py-2.5 rounded-xl text-xs font-bold text-indigo-100 hover:bg-indigo-800 transition"
+          >
+            💬 Mis Mensajes
+          </a>
+          <a
+            routerLink="/service-request/new"
+            (click)="closeMobileMenu()"
+            class="block text-center mt-2 px-3.5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-indigo-950 text-xs font-extrabold shadow-sm transition"
+          >
+            + Publicar Solicitud
+          </a>
+        }
+
+        @if (user.role === 'tecnico') {
+          <a
+            routerLink="/service-request"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-indigo-800 text-white"
+            class="block px-3.5 py-2.5 rounded-xl text-xs font-bold text-indigo-100 hover:bg-indigo-800 transition"
+          >
+            📥 Bandeja de Trabajos
+          </a>
+          <a
+            routerLink="/technician-profile"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-indigo-800 text-white"
+            class="block px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-300 hover:bg-indigo-800 transition"
+          >
+            🪪 Mi Ficha & Tarifas
+          </a>
+          <a
+            routerLink="/chat"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-indigo-800 text-white"
+            class="block px-3.5 py-2.5 rounded-xl text-xs font-bold text-indigo-100 hover:bg-indigo-800 transition"
+          >
+            💬 Mensajes con Clientes
+          </a>
+        }
+      </div>
+    }
+  }
+</header>

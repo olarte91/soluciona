@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1b4b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#312e81;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fcd34d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Fondo redondeado idéntico al logo de la UI -->
+  <rect width="64" height="64" rx="16" fill="url(#grad)"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="none" stroke="#f59e0b" stroke-width="2" stroke-opacity="0.4"/>
+  <!-- Letra S estilizada amarilla -->
+  <text x="32" y="47" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="900" fill="url(#yellowGrad)" text-anchor="middle">S</text>
+</svg>
+

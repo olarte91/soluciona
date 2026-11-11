@@ -1,0 +1,236 @@
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+  
+  <!-- Banner para perfil de Técnico -->
+  @if (currentUser?.role === 'tecnico') {
+    <div class="mb-5 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+      <div class="flex items-center space-x-2">
+        <span class="text-lg shrink-0">🔧</span>
+        <div>
+          <span class="font-extrabold">Modo Profesional Técnico:</span>
+          <span class="text-amber-800 ml-1">Estás viendo el mapa de Armenia. Para postularte a trabajos de clientes, revisa tu bandeja.</span>
+        </div>
+      </div>
+      <a routerLink="/service-request" class="w-full sm:w-auto text-center px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold shadow-xs transition">
+        Ver Trabajos Disponibles →
+      </a>
+    </div>
+  }
+
+  <!-- Encabezado y Filtros Rápidos -->
+  <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-100 mb-5 sm:mb-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+          Buscar Técnicos en Armenia, Quindío
+        </h1>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Servicios técnicos y reparaciones del hogar por cercanía geográfica
+        </p>
+      </div>
+
+      <!-- Botón de GPS -->
+      <button
+        type="button"
+        (click)="detectLocation()"
+        [disabled]="isDetectingLocation"
+        class="w-full md:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition border border-indigo-100 cursor-pointer"
+      >
+        <span>📍</span>
+        <span>{{ isDetectingLocation ? 'Localizando GPS...' : 'Usar Mi Ubicación Actual' }}</span>
+      </button>
+    </div>
+
+    <!-- Filtros de Especialidad y Distancia -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5 pt-5 border-t border-slate-100">
+      
+      <!-- Filtro de Especialidad -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+          1. Oficio o Especialidad
+        </label>
+        <select
+          [(ngModel)]="selectedSpecialty"
+          (change)="onFilterChange()"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 bg-white"
+        >
+          <option value="todos">🔧 Todas las Especialidades</option>
+          <option value="Plomería">🚰 Plomería e Hidráulica</option>
+          <option value="Electricidad">⚡ Electricidad Residencial</option>
+          <option value="Pintura">🎨 Pintura y Acabados</option>
+          <option value="Albañilería">🧱 Albañilería y Enchapes</option>
+          <option value="Cerrajería">🔑 Cerrajería</option>
+        </select>
+      </div>
+
+      <!-- Radio de Búsqueda Explicado -->
+      <div class="lg:col-span-2">
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            2. Distancia Máxima: <span class="text-indigo-600 font-extrabold">{{ radiusKm }} km</span>
+          </label>
+        </div>
+        <p class="text-[11px] text-slate-400 mb-2">
+          Filtra técnicos ubicados a menos de esta distancia de tu ubicación en Armenia:
+        </p>
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          @for (r of [3, 7, 15, 25]; track r) {
+            <button
+              type="button"
+              (click)="setRadius(r)"
+              [class.bg-indigo-600]="radiusKm === r"
+              [class.text-white]="radiusKm === r"
+              [class.bg-slate-100]="radiusKm !== r"
+              [class.text-slate-700]="radiusKm !== r"
+              class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition hover:bg-indigo-500 hover:text-white cursor-pointer"
+            >
+              {{ r === 3 ? '3 km (Barrio)' : r === 7 ? '7 km (Cercano)' : r === 15 ? '15 km (Armenia)' : '25 km (Regional)' }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Conteo y Publicar Solicitud (Solo clientes) -->
+      <div class="sm:col-span-2 lg:col-span-1 flex items-center justify-between lg:justify-end gap-3 self-center pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+        <div class="text-left lg:text-right">
+          <span class="block text-xs text-slate-400 font-semibold">Técnicos encontrados</span>
+          <span class="text-lg font-black text-slate-800">{{ technicians.length }} listos</span>
+        </div>
+        @if (currentUser?.role !== 'tecnico') {
+          <a
+            routerLink="/service-request/new"
+            class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-indigo-950 text-xs font-extrabold shadow-sm transition transform hover:-translate-y-0.5 whitespace-nowrap"
+          >
+            + Publicar Daño
+          </a>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Selector de Vista Móvil / Tablet (< 1024px) -->
+  <div class="flex lg:hidden bg-slate-200/80 p-1 rounded-2xl mb-4 gap-1">
+    <button
+      type="button"
+      (click)="setMobileTab('list')"
+      [class.bg-white]="mobileTab === 'list'"
+      [class.text-indigo-900]="mobileTab === 'list'"
+      [class.shadow-sm]="mobileTab === 'list'"
+      [class.text-slate-600]="mobileTab !== 'list'"
+      class="flex-1 py-2.5 px-2 sm:px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+    >
+      <span>📋 Técnicos</span>
+      <span class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-50 text-indigo-700 font-extrabold">{{ technicians.length }}</span>
+    </button>
+    <button
+      type="button"
+      (click)="setMobileTab('map')"
+      [class.bg-white]="mobileTab === 'map'"
+      [class.text-indigo-900]="mobileTab === 'map'"
+      [class.shadow-sm]="mobileTab === 'map'"
+      [class.text-slate-600]="mobileTab !== 'map'"
+      class="flex-1 py-2.5 px-2 sm:px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+    >
+      <span>🗺️ Ver Mapa</span>
+    </button>
+  </div>
+
+  <!-- Layout Dual: Mapa y Lista de Técnicos -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+    
+    <!-- Panel Izquierdo: Lista de Técnicos Ordenados por Distancia (Haversine) -->
+    <div
+      [class.hidden]="mobileTab === 'map'"
+      class="lg:block lg:col-span-5 space-y-4 lg:max-h-[750px] lg:overflow-y-auto lg:pr-1"
+    >
+      @if (loading) {
+        <div class="text-center py-12 bg-white rounded-3xl border border-slate-100">
+          <div class="text-2xl animate-spin mb-2">🔄</div>
+          <p class="text-xs text-slate-500 font-medium">Buscando técnicos cercanos en Armenia...</p>
+        </div>
+      } @else {
+        @for (tech of technicians; track tech.technician_id) {
+          <app-technician-card
+            [technician]="tech"
+            (onSelect)="focusTechnicianOnMap(tech)"
+            (onContact)="contactTechnician(tech)"
+          ></app-technician-card>
+        } @empty {
+          <div class="text-center py-12 bg-white rounded-3xl border border-slate-100 p-6">
+            <div class="text-4xl mb-3">📍</div>
+            <h3 class="font-bold text-slate-800 text-sm">No encontramos técnicos en este radio</h3>
+            <p class="text-xs text-slate-500 mt-1">
+              Prueba ampliando el radio de cobertura o seleccionando "Todas las especialidades".
+            </p>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Panel Derecho: Mapa Interactivo con Leaflet.js -->
+    <div
+      id="mapSection"
+      [class.hidden]="mobileTab === 'list'"
+      class="lg:block lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl p-2 sm:p-3 shadow-sm border border-slate-100 lg:sticky lg:top-20"
+    >
+      <div class="relative w-full h-[430px] sm:h-[520px] lg:h-[620px] rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+        
+        <!-- Badge flotante de ubicación actual -->
+        <div class="hidden sm:block absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-md border border-slate-200 text-[11px] font-bold text-slate-800 pointer-events-none">
+          📍 Armenia ({{ userLat | number:'1.4-4' }}, {{ userLng | number:'1.4-4' }})
+        </div>
+
+        <!-- Botón flotante móvil para volver a la lista -->
+        <div class="lg:hidden absolute top-3 left-14 z-[1000]">
+          <button
+            type="button"
+            (click)="setMobileTab('list')"
+            class="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-md border border-slate-200 text-[11px] font-bold text-indigo-700 hover:bg-indigo-50 transition flex items-center space-x-1 cursor-pointer"
+          >
+            <span>← Lista</span>
+          </button>
+        </div>
+
+        <!-- Contenedor puro para Leaflet DOM -->
+        <div #mapContainer id="solucionaArmeniaMap" class="h-full w-full block"></div>
+
+        <!-- Tarjeta flotante interactiva del técnico seleccionado en el mapa -->
+        @if (selectedTechnician) {
+          <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-[1000] bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-xl border border-indigo-100 flex items-center justify-between gap-2 sm:gap-3 animate-fade-in">
+            <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 text-white font-black flex items-center justify-center text-sm shadow shrink-0">
+                {{ selectedTechnician.full_name.charAt(0) }}
+              </div>
+              <div class="min-w-0">
+                <h4 class="font-bold text-slate-900 text-xs truncate">{{ selectedTechnician.full_name }}</h4>
+                <p class="text-[10px] sm:text-[11px] text-indigo-600 font-semibold truncate">
+                  🔧 {{ selectedTechnician.specialty }} • 📍 {{ selectedTechnician.distance_km }} km • ★ {{ selectedTechnician.rating_avg }}
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <button
+                type="button"
+                (click)="contactTechnician(selectedTechnician)"
+                class="px-3 sm:px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-sm transition cursor-pointer"
+              >
+                Contactar
+              </button>
+              <button
+                type="button"
+                (click)="selectedTechnician = null"
+                class="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition text-xs font-bold cursor-pointer"
+                title="Cerrar"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

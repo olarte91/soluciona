@@ -1,0 +1,204 @@
+<div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-6">
+  
+  <!-- Layout Dual de Mensajería: Lista de Conversaciones + Chat Activo -->
+  <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 overflow-hidden grid grid-cols-1 md:grid-cols-12 h-[calc(100dvh-5.75rem)] md:h-[calc(100vh-8.5rem)]">
+    
+    <!-- PANEL IZQUIERDO: Lista de Conversaciones / Solicitudes -->
+    <div
+      [class.hidden]="mobileShowChat()"
+      class="md:col-span-4 lg:col-span-4 border-r border-slate-100 md:flex flex-col h-full min-h-0 bg-slate-50"
+      [class.flex]="!mobileShowChat()"
+    >
+      
+      <div class="p-3.5 sm:p-4 border-b border-slate-200 bg-white shrink-0">
+        <h2 class="text-sm sm:text-base font-black text-slate-900 tracking-tight flex items-center space-x-2">
+          <span>💬</span>
+          <span>{{ isTechnician ? 'Conversaciones con Clientes' : 'Mis Chats con Técnicos' }}</span>
+        </h2>
+        <p class="text-[11px] text-slate-500 mt-0.5">
+          Acuerdos y presupuestos de servicios en Armenia
+        </p>
+      </div>
+
+      <!-- Lista de Chats -->
+      <div class="flex-1 overflow-y-auto divide-y divide-slate-100">
+        @for (conv of conversations; track conv.id) {
+          <button
+            type="button"
+            (click)="selectConversation(conv.id)"
+            [class.bg-indigo-50]="selectedRequestId === conv.id"
+            [class.border-l-4]="selectedRequestId === conv.id"
+            [class.border-indigo-600]="selectedRequestId === conv.id"
+            class="w-full p-3.5 sm:p-4 text-left hover:bg-slate-100 transition flex items-start space-x-3 cursor-pointer"
+          >
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-amber-300 font-extrabold flex items-center justify-center shrink-0 text-sm shadow-xs">
+              {{ getCounterpartInitials(conv) }}
+            </div>
+            
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <h4 class="text-xs font-bold text-slate-900 truncate">
+                  {{ getCounterpartName(conv) }}
+                </h4>
+                <span class="text-[9px] px-1.5 py-0.5 rounded font-semibold bg-slate-200 text-slate-700 uppercase shrink-0">
+                  {{ conv.status.replace('_', ' ') }}
+                </span>
+              </div>
+              
+              <p class="text-[11px] text-indigo-700 font-semibold truncate mt-0.5">
+                🔧 {{ conv.specialty_required }}: {{ conv.description }}
+              </p>
+              
+              <div class="text-[10px] text-slate-400 truncate mt-0.5">
+                📍 {{ conv.address }}
+              </div>
+            </div>
+          </button>
+        } @empty {
+          <div class="p-6 text-center text-xs text-slate-400">
+            <div class="text-3xl mb-2">📭</div>
+            Aún no tienes conversaciones activas. Inicia un chat desde tus solicitudes.
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- PANEL DERECHO: Sala de Chat Activa -->
+    <div
+      [class.hidden]="!mobileShowChat()"
+      [class.flex]="mobileShowChat()"
+      class="md:col-span-8 lg:col-span-8 md:flex flex-col h-full min-h-0 bg-white"
+    >
+      
+      @if (activeRequest) {
+        <!-- Header del Chat con Contexto Completo -->
+        <div class="p-3 sm:p-4 bg-slate-900 text-white flex items-center justify-between gap-2 border-b border-slate-800 shrink-0">
+          <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+            <!-- Botón regresar en móvil -->
+            <button
+              type="button"
+              (click)="backToConversations()"
+              class="md:hidden p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold shrink-0 cursor-pointer"
+              aria-label="Volver a conversaciones"
+            >
+              ←
+            </button>
+
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-400 text-slate-950 font-black flex items-center justify-center text-sm shadow-sm shrink-0">
+              {{ getCounterpartInitials(activeRequest) }}
+            </div>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <h3 class="font-bold text-xs sm:text-sm tracking-tight truncate">
+                  {{ getCounterpartName(activeRequest) }}
+                </h3>
+                @if (isTechnician) {
+                  <span class="hidden sm:inline text-[10px] bg-amber-400/20 text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-400/30">
+                    ★ 5.0 Cliente
+                  </span>
+                }
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  En línea
+                </span>
+              </div>
+              <p class="text-[10px] sm:text-[11px] text-slate-300 truncate">
+                🔧 {{ activeRequest.specialty_required }} • {{ activeRequest.address }}
+              </p>
+            </div>
+          </div>
+
+          <div class="shrink-0 flex items-center space-x-2">
+            <span class="text-[11px] bg-slate-800 text-amber-300 font-semibold px-2.5 py-1 rounded-full border border-slate-700 hidden lg:inline">
+              ⚡ Negociación Ley 2466
+            </span>
+            <a routerLink="/service-request" class="text-[11px] sm:text-xs bg-slate-800 hover:bg-slate-700 px-2.5 sm:px-3 py-1.5 rounded-lg text-slate-200 transition whitespace-nowrap">
+              Ver Solicitud
+            </a>
+          </div>
+        </div>
+
+        <!-- Banner Informativo Ley 2466 de 2025 -->
+        <div class="bg-amber-50 px-3 sm:px-4 py-1.5 border-b border-amber-200 text-amber-950 text-[10px] sm:text-[11px] shrink-0">
+          ⚖️ <strong>Acuerdo Autónomo:</strong> Acuerden la tarifa y el horario de visita directamente sin comisión oculta.
+        </div>
+
+        <!-- Cuerpo de Mensajes -->
+        <div #scrollContainer class="flex-1 p-3 sm:p-6 overflow-y-auto space-y-3 sm:space-y-4 bg-slate-50/50">
+          @for (msg of messages(); track msg.id) {
+            <div
+              class="flex flex-col"
+              [class.items-end]="isMyMessage(msg)"
+              [class.items-start]="!isMyMessage(msg)"
+            >
+              <div
+                class="max-w-[85%] sm:max-w-[70%] rounded-2xl px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs shadow-xs"
+                [class.bg-indigo-600]="isMyMessage(msg)"
+                [class.text-white]="isMyMessage(msg)"
+                [class.rounded-tr-none]="isMyMessage(msg)"
+                [class.bg-white]="!isMyMessage(msg)"
+                [class.text-slate-800]="!isMyMessage(msg)"
+                [class.border]="!isMyMessage(msg)"
+                [class.border-slate-200]="!isMyMessage(msg)"
+                [class.rounded-tl-none]="!isMyMessage(msg)"
+              >
+                <div class="text-[10px] font-bold mb-0.5 opacity-80">
+                  {{ isMyMessage(msg) ? 'Tú' : getCounterpartName(activeRequest) }}
+                </div>
+                <p class="leading-relaxed whitespace-pre-wrap break-words">{{ msg.content }}</p>
+                <div
+                  class="text-[9px] mt-1 text-right"
+                  [class.text-indigo-200]="isMyMessage(msg)"
+                  [class.text-slate-400]="!isMyMessage(msg)"
+                >
+                  {{ msg.sent_at | date:'shortTime' }}
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="text-center py-12 text-slate-400 text-xs">
+              <div class="text-3xl mb-2">💬</div>
+              Inicia la conversación acordando los detalles de la visita técnica o presupuesto en Armenia.
+            </div>
+          }
+        </div>
+
+        <!-- Barra de Envío de Mensajes -->
+        <div class="p-2.5 sm:p-4 bg-white border-t border-slate-200 shrink-0">
+          <form (ngSubmit)="sendMessage()" class="flex items-center gap-2">
+            <input
+              type="text"
+              [(ngModel)]="newContent"
+              name="newContent"
+              placeholder="Escribe tu mensaje o presupuesto..."
+              autocomplete="off"
+              class="flex-1 min-w-0 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            />
+            <button
+              type="submit"
+              [disabled]="!newContent.trim() || isSending"
+              class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition disabled:opacity-40 cursor-pointer shrink-0"
+            >
+              {{ isSending ? '...' : 'Enviar' }}
+            </button>
+          </form>
+        </div>
+      } @else {
+        <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center text-slate-400">
+          <div class="w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-600 text-3xl flex items-center justify-center mb-3">
+            💬
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-1">
+            Selecciona una conversación
+          </h3>
+          <p class="text-xs max-w-sm">
+            Elige una de tus solicitudes para chatear en tiempo real y acordar las visitas técnicas en Armenia.
+          </p>
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+</div>

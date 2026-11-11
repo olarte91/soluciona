@@ -1,0 +1,90 @@
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-5 sm:space-y-6 bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+
+    <div class="text-center">
+      <div
+        class="inline-flex w-16 h-16 rounded-2xl bg-indigo-600 text-amber-400 font-extrabold text-3xl items-center justify-center shadow-lg mb-4">
+        S
+      </div>
+      <h2 class="text-2xl font-black text-slate-900 tracking-tight">Bienvenido a Soluciona</h2>
+      <p class="text-xs text-slate-500 mt-1">
+        Plataforma Web de Servicios Especializados • Armenia, Quindío
+      </p>
+    </div>
+
+    <!-- Alerta de Error -->
+    @if (errorMessage) {
+    <div class="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs">
+      ⚠️ {{ errorMessage }}
+    </div>
+    }
+
+    <!-- Selector de Perfil -->
+    <div>
+      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+        Selecciona tu perfil de acceso:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button type="button" (click)="selectRole('cliente')" [class.ring-2]="selectedRole === 'cliente'"
+          [class.ring-indigo-600]="selectedRole === 'cliente'" [class.bg-indigo-50]="selectedRole === 'cliente'"
+          [class.border-indigo-600]="selectedRole === 'cliente'"
+          class="p-3.5 rounded-2xl border-2 border-slate-200 text-left transition hover:border-indigo-300 relative cursor-pointer">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xl">🏠</span>
+            @if (selectedRole === 'cliente') {
+            <span class="text-xs text-indigo-600 font-black">✓ Activo</span>
+            }
+          </div>
+          <div class="font-black text-xs text-slate-900">Como Cliente</div>
+          <div class="text-[10px] text-slate-500 leading-tight">Buscar técnicos y solicitar servicios</div>
+        </button>
+
+        <button type="button" (click)="selectRole('tecnico')" [class.ring-2]="selectedRole === 'tecnico'"
+          [class.ring-amber-500]="selectedRole === 'tecnico'" [class.bg-amber-50]="selectedRole === 'tecnico'"
+          [class.border-amber-500]="selectedRole === 'tecnico'"
+          class="p-3.5 rounded-2xl border-2 border-slate-200 text-left transition hover:border-amber-300 relative cursor-pointer">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xl">🔧</span>
+            @if (selectedRole === 'tecnico') {
+            <span class="text-xs text-amber-600 font-black">✓ Activo</span>
+            }
+          </div>
+          <div class="font-black text-xs text-slate-900">Como Técnico</div>
+          <div class="text-[10px] text-slate-500 leading-tight">Ver bandeja y gestionar tarifas</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario con inputs limpios mostrando placeholder -->
+    <form class="space-y-4" (ngSubmit)="onSubmit()">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Correo Electrónico
+        </label>
+        <input type="email" [(ngModel)]="email" name="email" required placeholder="tu-correo@ejemplo.com"
+          class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Contraseña
+        </label>
+        <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••"
+          class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition" />
+      </div>
+
+      <button type="submit" [disabled]="loading"
+        class="w-full py-3.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition transform hover:-translate-y-0.5 disabled:opacity-50 cursor-pointer">
+        {{ loading ? 'Ingresando a Soluciona...' : 'Ingresar a la Plataforma' }}
+      </button>
+    </form>
+
+    <div class="text-center text-xs text-slate-500 pt-2">
+      ¿No tienes una cuenta aún?
+      <a routerLink="/auth/register" class="font-bold text-indigo-600 hover:underline ml-1">
+        Regístrate aquí
+      </a>
+    </div>
+
+  </div>
+</div>

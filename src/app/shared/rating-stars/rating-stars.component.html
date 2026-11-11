@@ -1,0 +1,32 @@
+<div class="flex items-center space-x-1" [class.cursor-pointer]="interactive">
+  @for (star of stars; track star; let i = $index) {
+    @if (interactive) {
+      <button
+        type="button"
+        (click)="setRating(i + 1)"
+        (mouseenter)="hoverRating = i + 1"
+        (mouseleave)="hoverRating = 0"
+        class="text-2xl transition-transform hover:scale-110 focus:outline-none"
+        [attr.aria-label]="'Calificar con ' + (i + 1) + ' estrellas'"
+      >
+        <span [class.text-amber-400]="(hoverRating || rating) >= (i + 1)" [class.text-slate-300]="(hoverRating || rating) < (i + 1)">
+          ★
+        </span>
+      </button>
+    } @else {
+      <span
+        class="text-lg"
+        [class.text-amber-400]="rating >= (i + 1)"
+        [class.text-amber-200]="rating > i && rating < (i + 1)"
+        [class.text-slate-300]="rating <= i"
+      >
+        ★
+      </span>
+    }
+  }
+  @if (showNumber) {
+    <span class="text-sm font-semibold text-slate-700 ml-1.5">
+      {{ rating | number:'1.1-2' }}
+    </span>
+  }
+</div>

@@ -1,0 +1,85 @@
+<div class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 transform transition-all animate-in fade-in zoom-in-95">
+    
+    <div class="text-center mb-6">
+      <div class="inline-flex w-14 h-14 rounded-2xl bg-amber-100 text-amber-800 text-2xl items-center justify-center mb-3">
+        🎖️
+      </div>
+      <h3 class="text-xl font-black text-slate-900 tracking-tight">
+        {{ isTechnician ? 'Calificar al Cliente' : 'Calificar Servicio Técnico' }}
+      </h3>
+      <p class="text-xs text-slate-500 mt-1">
+        {{ isTechnician
+            ? 'Evalúa el trato, puntualidad y cumplimiento de pago del cliente en Armenia.'
+            : 'Escala oficial de 1 a 5 estrellas para la reputación comunitaria en Armenia.' }}
+      </p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="p-3 mb-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+        ⚠️ {{ errorMessage }}
+      </div>
+    }
+
+    <form (ngSubmit)="submitReview()" class="space-y-5">
+      
+      <!-- Selector de Estrellas Interactivo (HU-07) - Estrictamente 5 estrellas -->
+      <div class="text-center bg-slate-50 p-4 rounded-2xl border border-slate-200">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+          Puntuación del Servicio (Máximo 5 Estrellas)
+        </label>
+        <div class="flex justify-center">
+          <app-rating-stars
+            [rating]="rating"
+            [interactive]="true"
+            [showNumber]="false"
+            (ratingChange)="rating = $event"
+          ></app-rating-stars>
+        </div>
+        <div class="text-xs font-extrabold text-amber-600 mt-2">
+          {{ getRatingLabel(rating) }}
+        </div>
+      </div>
+
+      <!-- Comentario libre -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Comentario u Observaciones
+        </label>
+        <textarea
+          [(ngModel)]="comment"
+          name="comment"
+          rows="3"
+          [placeholder]="isTechnician 
+            ? '¿Cómo fue la puntualidad, claridad y cumplimiento del cliente?' 
+            : '¿Cómo fue la puntualidad, calidad técnica y cumplimiento del trabajo acordado?'"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"
+        ></textarea>
+      </div>
+
+      <!-- Cumplimiento Legal Ley 1480 de 2012 -->
+      <div class="text-[10px] text-slate-400 leading-tight">
+        🛡️ <strong>Ley 1480 de 2012 (Estatuto del Consumidor):</strong> Esta calificación formará parte del perfil público y no podrá ser alterada de manera discrecional.
+      </div>
+
+      <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 pt-3">
+        <button
+          type="button"
+          (click)="onClose.emit()"
+          class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+        >
+          Cerrar
+        </button>
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-indigo-950 font-black text-xs shadow-md transition disabled:opacity-40 cursor-pointer"
+        >
+          {{ loading ? 'Guardando...' : 'Publicar Calificación' }}
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
